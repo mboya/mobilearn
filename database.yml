@@ -3,6 +3,7 @@ users
 -user_surname
 -user_lastname
 -user_course
+-user_registration
 -user_nickname
 -user_salt
 -user_password

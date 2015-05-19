@@ -13,22 +13,23 @@
             $un = stripslashes($_POST['nickname']);
             $pw = stripslashes($_POST['password']);
 
-            $result = mysql_query("SELECT * FROM `users` WHERE`users_nickname` = '$un'");
+            $result = mysql_query("SELECT * FROM `users` WHERE`user_nickname` = '$un'");
             $count = mysql_num_rows($result);
 
             if ($count > 0){
                 $result = mysql_fetch_array($result);
-                $salt = $result['users_salt'];
-                $encrypted_password = $result['users_encrypted_password'];
+                $salt = $result['user_salt'];
+                $encrypted_password = $result['user_password'];
                 $hash = base64_encode(sha1($pw . $salt, true) . $salt);
 
                 if ($hash == $encrypted_password){
-                    $response["users"] = array();
+                    $response["user"] = array();
 
-                    $users["users_names"] = $result["users_names"];
-                    $users["users_phone_number"] = $result["users_phone_number"];
+                    $users["user_surname"] = $result["user_surname"];
+                    $users["user_registration"] = $result["user_registration"];
+                    $users["user_course"] = $result["user_course"]
 
-                    array_push($response["users"], $users);
+                    array_push($response["user"], $users);
                     $response["success"] = 1;
                     echo json_encode($response);
                 }else{
@@ -59,6 +60,29 @@
             }else{
                 $response['success'] = 0;
                 echo json_encode($response);
+            }
+        }
+        elseif ($tag == 'register'){
+            $sn = stripslashes($_POST['surname']);
+            $ln = stripslashes($_POST['lastname']);
+            $c = stripslashes($_POST['course']);
+            $rn = stripslashes($_POST['registration']);
+            $un = stripslashes($_POST['nickname']);
+
+            $salt = sha1(rand());
+            $salt = substr($salt, 0, 10);
+            $pw = stripslashes($_POST['password']);
+            $encrypted_password = base64_encode(sha1($pw.$salt, true));
+
+            mysql_query('BEGIN');
+            mysql_query('START TRANSACTION');
+            $query = mysql_query("INSERT INTO `users`(`user_surname`, `user_lastname`, `user_course`, `user_registration`, `user_nickname`, `user_salt`, `user_password`, `created_at`, `updated_at`)
+            VALUES ('$sn','$ln','$c','$rn',$un,$salt,$encrypted_password,NOW(),NOW())");
+            if ($query){
+                mysql_query('COMMIT');
+
+            }else{
+                mysql_query('ROLLBACK');
             }
         }
     }
