@@ -80,9 +80,12 @@
             VALUES ('$sn','$ln','$c','$rn',$un,$salt,$encrypted_password,NOW(),NOW())");
             if ($query){
                 mysql_query('COMMIT');
-
+                $response['success'] = 1;
+                echo json_encode($response);
             }else{
                 mysql_query('ROLLBACK');
+                $response['success'] = 0;
+                echo json_encode($response);
             }
         }
     }
